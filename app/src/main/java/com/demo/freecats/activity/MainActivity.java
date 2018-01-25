@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -168,7 +169,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (null != mWebView) {
-                    mWebView.loadUrl("javascript:(function(){ "
+
+                    String js = "javascript:(function(){ "
                             + " var objs = document.getElementsByTagName(\"img\"); "
                             + " for(var i=0;i<objs.length;i++)  "
                             + " {"
@@ -178,8 +180,25 @@ public class MainActivity extends AppCompatActivity {
                             + "      window.imageListener.openImage(this.src, this.dataset.src);  "
                             + "     }  "
                             + " } "
-                            + " })()");
+                            + " })()";
+
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT){
+                        Log.w("TAG" , " == load js  == ");
+                        mWebView.loadUrl(js);
+                    }else {
+                        mWebView.evaluateJavascript(js, new ValueCallback<String>() {
+                            @Override
+                            public void onReceiveValue(String value) {
+                                Log.w("TAG" , " == evaluateJavascript  == "+ value+ " , "+ mLists.toString());
+                            }
+                        });
+                    }
+
                 }
+
+
+
+
             }
         } , 500);
     }
